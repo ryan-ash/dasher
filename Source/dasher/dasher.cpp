@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "dasher.h"
+#include "Dasher.h"
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, dasher, "dasher" );
+IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Dasher, "Dasher" );
  

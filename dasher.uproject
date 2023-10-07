@@ -5,7 +5,7 @@
 	"Description": "",
 	"Modules": [
 		{
-			"Name": "dasher",
+			"Name": "Dasher",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}

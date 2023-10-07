@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "dasherCharacter.h"
-#include "dasherProjectile.h"
+#include "DasherCharacter.h"
+#include "DasherProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -10,9 +10,9 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-// AdasherCharacter
+// ADasherCharacter
 
-AdasherCharacter::AdasherCharacter()
+ADasherCharacter::ADasherCharacter()
 {
 	// Character doesnt have a rifle at start
 	bHasRifle = false;
@@ -37,7 +37,7 @@ AdasherCharacter::AdasherCharacter()
 
 }
 
-void AdasherCharacter::BeginPlay()
+void ADasherCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
@@ -55,7 +55,7 @@ void AdasherCharacter::BeginPlay()
 
 //////////////////////////////////////////////////////////////////////////// Input
 
-void AdasherCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+void ADasherCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
@@ -65,15 +65,15 @@ void AdasherCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AdasherCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADasherCharacter::Move);
 
 		//Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AdasherCharacter::Look);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADasherCharacter::Look);
 	}
 }
 
 
-void AdasherCharacter::Move(const FInputActionValue& Value)
+void ADasherCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -86,7 +86,7 @@ void AdasherCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
-void AdasherCharacter::Look(const FInputActionValue& Value)
+void ADasherCharacter::Look(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
@@ -99,12 +99,12 @@ void AdasherCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void AdasherCharacter::SetHasRifle(bool bNewHasRifle)
+void ADasherCharacter::SetHasRifle(bool bNewHasRifle)
 {
 	bHasRifle = bNewHasRifle;
 }
 
-bool AdasherCharacter::GetHasRifle()
+bool ADasherCharacter::GetHasRifle()
 {
 	return bHasRifle;
 }

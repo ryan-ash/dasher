@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "dasherProjectile.generated.h"
+#include "DasherProjectile.generated.h"
 
 class USphereComponent;
 class UProjectileMovementComponent;
 
 UCLASS(config=Game)
-class AdasherProjectile : public AActor
+class ADasherProjectile : public AActor
 {
 	GENERATED_BODY()
 
@@ -23,7 +23,7 @@ class AdasherProjectile : public AActor
 	UProjectileMovementComponent* ProjectileMovement;
 
 public:
-	AdasherProjectile();
+	ADasherProjectile();
 
 	/** called when projectile hits something */
 	UFUNCTION()

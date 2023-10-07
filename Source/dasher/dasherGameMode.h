@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "dasherGameMode.generated.h"
+#include "DasherGameMode.generated.h"
 
 UCLASS(minimalapi)
-class AdasherGameMode : public AGameModeBase
+class ADasherGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	AdasherGameMode();
+	ADasherGameMode();
 };
 
 

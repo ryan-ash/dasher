@@ -1,10 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "dasherGameMode.h"
-#include "dasherCharacter.h"
+#include "DasherGameMode.h"
+#include "DasherCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
-AdasherGameMode::AdasherGameMode()
+ADasherGameMode::ADasherGameMode()
 	: Super()
 {
 	// set default pawn class to our Blueprinted character

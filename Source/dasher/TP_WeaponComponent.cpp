@@ -2,8 +2,8 @@
 
 
 #include "TP_WeaponComponent.h"
-#include "dasherCharacter.h"
-#include "dasherProjectile.h"
+#include "DasherCharacter.h"
+#include "DasherProjectile.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -41,7 +41,7 @@ void UTP_WeaponComponent::Fire()
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 	
 			// Spawn the projectile at the muzzle
-			World->SpawnActor<AdasherProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			World->SpawnActor<ADasherProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 		}
 	}
 	
@@ -63,7 +63,7 @@ void UTP_WeaponComponent::Fire()
 	}
 }
 
-void UTP_WeaponComponent::AttachWeapon(AdasherCharacter* TargetCharacter)
+void UTP_WeaponComponent::AttachWeapon(ADasherCharacter* TargetCharacter)
 {
 	Character = TargetCharacter;
 	if (Character == nullptr)

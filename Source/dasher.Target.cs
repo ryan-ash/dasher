@@ -3,13 +3,13 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class dasherTarget : TargetRules
+public class DasherTarget : TargetRules
 {
-	public dasherTarget(TargetInfo Target) : base(Target)
+	public DasherTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_1;
-		ExtraModuleNames.Add("dasher");
+		ExtraModuleNames.Add("Dasher");
 	}
 }

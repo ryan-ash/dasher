@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-#include "dasherCharacter.generated.h"
+#include "DasherCharacter.generated.h"
 
 class UInputComponent;
 class USkeletalMeshComponent;
@@ -15,7 +15,7 @@ class UAnimMontage;
 class USoundBase;
 
 UCLASS(config=Game)
-class AdasherCharacter : public ACharacter
+class ADasherCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -41,7 +41,7 @@ class AdasherCharacter : public ACharacter
 
 	
 public:
-	AdasherCharacter();
+	ADasherCharacter();
 
 protected:
 	virtual void BeginPlay();

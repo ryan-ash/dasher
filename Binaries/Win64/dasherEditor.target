@@ -1,11 +1,11 @@
 {
-	"TargetName": "dasherEditor",
+	"TargetName": "DasherEditor",
 	"Platform": "Win64",
 	"Configuration": "Development",
 	"TargetType": "Editor",
 	"IsTestTarget": false,
 	"Architecture": "x64",
-	"Project": "../../dasher.uproject",
+	"Project": "../../Dasher.uproject",
 	"Launch": "$(EngineDir)/Binaries/Win64/UnrealEditor.exe",
 	"LaunchCmd": "$(EngineDir)/Binaries/Win64/UnrealEditor-Cmd.exe",
 	"Version": 
@@ -6018,11 +6018,11 @@
 			"Type": "RequiredResource"
 		},
 		{
-			"Path": "$(ProjectDir)/Binaries/Win64/UnrealEditor-dasher.dll",
+			"Path": "$(ProjectDir)/Binaries/Win64/UnrealEditor-Dasher.dll",
 			"Type": "DynamicLibrary"
 		},
 		{
-			"Path": "$(ProjectDir)/Binaries/Win64/UnrealEditor-dasher.pdb",
+			"Path": "$(ProjectDir)/Binaries/Win64/UnrealEditor-Dasher.pdb",
 			"Type": "SymbolFile"
 		},
 		{
@@ -27208,7 +27208,7 @@
 			"Type": "UFS"
 		},
 		{
-			"Path": "$(ProjectDir)/dasher.uproject",
+			"Path": "$(ProjectDir)/Dasher.uproject",
 			"Type": "UFS"
 		}
 	],

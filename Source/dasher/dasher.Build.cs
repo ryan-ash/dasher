@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class dasher : ModuleRules
+public class Dasher : ModuleRules
 {
-	public dasher(ReadOnlyTargetRules Target) : base(Target)
+	public Dasher(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
