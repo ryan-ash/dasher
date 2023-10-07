@@ -2,7 +2,6 @@
 	"BuildId": "25360045",
 	"Modules": 
 	{
-		"Dasher": "UnrealEditor-Dasher.dll",
-		"dasher": "UnrealEditor-dasher.dll"
+		"Dasher": "UnrealEditor-Dasher.dll"
 	}
 }
