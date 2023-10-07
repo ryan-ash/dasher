@@ -3,9 +3,11 @@
 #include "DasherCharacter.h"
 
 #include "Actors/DasherProjectile.h"
+
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
@@ -110,22 +112,30 @@ void ADasherCharacter::Look(const FInputActionValue& Value)
 
 void ADasherCharacter::Sprint(const FInputActionValue& Value)
 {
-
+	if (GetCharacterMovement()->IsCrouching() || GetCharacterMovement()->IsFalling() || !Speeds.Contains(EMovementSpeed::Sprint))
+	{
+		return;
+	}
+	GetCharacterMovement()->MaxWalkSpeed = Speeds[EMovementSpeed::Sprint];
 }
 
 void ADasherCharacter::StopSprinting(const FInputActionValue& Value)
 {
-
+	if (!Speeds.Contains(EMovementSpeed::Walk))
+	{
+		return;
+	}
+	GetCharacterMovement()->MaxWalkSpeed = Speeds[EMovementSpeed::Walk];
 }
 
 void ADasherCharacter::TryCrouch(const FInputActionValue& Value)
 {
-
+	Crouch(false);
 }
 
 void ADasherCharacter::TryUnCrouch(const FInputActionValue& Value)
 {
-
+	UnCrouch(false);
 }
 
 void ADasherCharacter::SetHasRifle(bool bNewHasRifle)

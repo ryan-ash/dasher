@@ -15,6 +15,15 @@ class UCameraComponent;
 class UAnimMontage;
 class USoundBase;
 
+
+UENUM(BlueprintType)
+enum class EMovementSpeed : uint8
+{
+	None,
+	Walk,
+	Sprint
+};
+
 UCLASS(config=Game)
 class ADasherCharacter : public ACharacter
 {
@@ -73,9 +82,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	bool GetHasRifle();
 
-	/** Character movement speeds by name */
+	/** Character movement speeds */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speeds)
-	TMap<FName, float> Speeds;
+	TMap<EMovementSpeed, float> Speeds;
 
 protected:
 	/** Called for movement input */
@@ -112,7 +121,4 @@ public:
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-
-
 };
-
