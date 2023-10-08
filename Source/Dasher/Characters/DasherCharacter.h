@@ -34,6 +34,15 @@ class ADasherCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+public:
+
+	ADasherCharacter();
+
+protected:
+
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
 	USkeletalMeshComponent* Mesh1P;
@@ -41,6 +50,8 @@ class ADasherCharacter : public ACharacter
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
+	
+public:
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
@@ -62,18 +73,17 @@ class ADasherCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* CrouchAction;
 
-	
-public:
-	ADasherCharacter();
-
-protected:
-	virtual void BeginPlay();
-
-public:
-		
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
+
+	/** MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputMappingContext* FireMappingContext;
+
+	/** Fire Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputAction* FireAction;
 
 	/** Character movement speeds */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speeds)
@@ -110,11 +120,27 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = Input)
 	void TryUnCrouch(const FInputActionValue& Value);
 
+	UFUNCTION(BlueprintCallable, Category = Input)
+	void Fire(const FInputActionValue& Value);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = Network)
+	void ServerFire();
+
+	UFUNCTION(BlueprintCallable, Category = Input)
+	void StopFire(const FInputActionValue& Value);
+
+	UFUNCTION(BlueprintCallable, Category = Input)
+	void AltFire(const FInputActionValue& Value);
+
 public:
 
 	/** Bool for AnimBP to switch to another animation set */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
 	bool bHasRifle;
+
+	/** Called for picking up actors */
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void PickUp(AActor* PickedUpActor);
 
 	/** Setter to set the bool */
 	UFUNCTION(BlueprintCallable, Category = Weapon)
@@ -124,9 +150,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	bool GetHasRifle();
 
-	/** Called for picking up actors */
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	void PickUp(AActor* PickedUpActor);
+protected:
+
+	void SubscribeToWeaponInput();
+	void UnsubscribeToWeaponInput();
 
 protected:
 	// APawn interface
@@ -138,4 +165,8 @@ public:
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
+private:
+
+	TWeakObjectPtr<UTP_WeaponComponent> ActiveWeaponComponent;
 };

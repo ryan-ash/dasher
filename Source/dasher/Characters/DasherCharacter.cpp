@@ -56,6 +56,21 @@ void ADasherCharacter::BeginPlay()
 
 }
 
+void ADasherCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// Remove Input Mapping Context
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->RemoveMappingContext(DefaultMappingContext);
+		}
+	}
+	UnsubscribeToWeaponInput();
+
+	Super::EndPlay(EndPlayReason);
+}
+
 //////////////////////////////////////////////////////////////////////////// Input
 
 void ADasherCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -138,9 +153,37 @@ void ADasherCharacter::TryUnCrouch(const FInputActionValue& Value)
 	UnCrouch(false);
 }
 
+void ADasherCharacter::Fire(const FInputActionValue& Value)
+{
+	if (ActiveWeaponComponent.IsValid())
+	{
+		ActiveWeaponComponent->Fire();
+		ServerFire();
+	}
+}
+
+void ADasherCharacter::ServerFire_Implementation()
+{
+	ActiveWeaponComponent->ServerFire();
+}
+
+void ADasherCharacter::StopFire(const FInputActionValue& Value)
+{
+
+}
+
+void ADasherCharacter::AltFire(const FInputActionValue& Value)
+{
+
+}
+
 void ADasherCharacter::SetHasRifle(bool bNewHasRifle)
 {
 	bHasRifle = bNewHasRifle;
+	if (bHasRifle)
+	{
+		SubscribeToWeaponInput();
+	}
 }
 
 bool ADasherCharacter::GetHasRifle()
@@ -148,14 +191,42 @@ bool ADasherCharacter::GetHasRifle()
 	return bHasRifle;
 }
 
+void ADasherCharacter::SubscribeToWeaponInput()
+{
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(FireMappingContext, 1);
+
+			if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
+			{
+				EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ADasherCharacter::Fire);
+				EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ADasherCharacter::StopFire);
+			}
+		}
+	}
+}
+
+void ADasherCharacter::UnsubscribeToWeaponInput()
+{
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->RemoveMappingContext(FireMappingContext);
+		}
+	}
+}
+
 void ADasherCharacter::PickUp(AActor* PickedUpActor)
 {
 	OnPickedActorUp.Broadcast(PickedUpActor);
 	if (const auto WeaponComponent = PickedUpActor->GetComponentByClass<UTP_WeaponComponent>())
 	{
+		ActiveWeaponComponent = WeaponComponent;
 		OnAttachedWeapon.Broadcast(WeaponComponent);
 		WeaponComponent->AttachWeapon(this, IsLocallyControlled());
-		SetHasRifle(true);
 	}
 	PickedUpActor->SetOwner(this);
 }
