@@ -49,6 +49,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Fire();
 
+	/** Make the weapon Fire a Projectile on the server */
+	UFUNCTION(Server, Reliable)
+	void ServerFire();
+
+
 protected:
 	/** Ends gameplay for this component. */
 	UFUNCTION()
