@@ -73,7 +73,7 @@ void UTP_WeaponComponent::ServerFire_Implementation()
 	}
 }
 
-void UTP_WeaponComponent::AttachWeapon(ADasherCharacter* TargetCharacter)
+void UTP_WeaponComponent::AttachWeapon(ADasherCharacter* TargetCharacter, bool IsFirstPerson)
 {
 	Character = TargetCharacter;
 	if (Character == nullptr)
@@ -81,9 +81,12 @@ void UTP_WeaponComponent::AttachWeapon(ADasherCharacter* TargetCharacter)
 		return;
 	}
 
-	// Attach the weapon to the First Person Character
-	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
+	if (IsFirstPerson)
+	{
+		// Attach the weapon to the First Person Character
+		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+		AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
+	}
 	
 	// switch bHasRifle so the animation blueprint can switch to another animation set
 	Character->SetHasRifle(true);

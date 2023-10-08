@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 
+#include "Components/TP_WeaponComponent.h"
+
 #include "DasherCharacter.generated.h"
 
 class UInputComponent;
@@ -15,6 +17,9 @@ class UCameraComponent;
 class UAnimMontage;
 class USoundBase;
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPickedActorUp, AActor*, PickedUpActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponAttached, UTP_WeaponComponent*, NewWeaponComponent);
 
 UENUM(BlueprintType)
 enum class EMovementSpeed : uint8
@@ -70,21 +75,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
-	/** Bool for AnimBP to switch to another animation set */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
-	bool bHasRifle;
-
-	/** Setter to set the bool */
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	void SetHasRifle(bool bNewHasRifle);
-
-	/** Getter for the bool */
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	bool GetHasRifle();
-
 	/** Character movement speeds */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speeds)
 	TMap<EMovementSpeed, float> Speeds;
+
+	UPROPERTY(BlueprintAssignable, Category = "Pickup")
+	FOnPickedActorUp OnPickedActorUp;
+
+	UPROPERTY(BlueprintAssignable, Category = "Pickup")
+	FOnWeaponAttached OnAttachedWeapon;
 
 protected:
 	/** Called for movement input */
@@ -110,6 +109,24 @@ protected:
 	/** Called for stopping crouch input */
 	UFUNCTION(BlueprintCallable, Category = Input)
 	void TryUnCrouch(const FInputActionValue& Value);
+
+public:
+
+	/** Bool for AnimBP to switch to another animation set */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
+	bool bHasRifle;
+
+	/** Setter to set the bool */
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void SetHasRifle(bool bNewHasRifle);
+
+	/** Getter for the bool */
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	bool GetHasRifle();
+
+	/** Called for picking up actors */
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void PickUp(AActor* PickedUpActor);
 
 protected:
 	// APawn interface

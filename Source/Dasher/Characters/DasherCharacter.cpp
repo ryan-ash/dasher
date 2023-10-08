@@ -147,3 +147,15 @@ bool ADasherCharacter::GetHasRifle()
 {
 	return bHasRifle;
 }
+
+void ADasherCharacter::PickUp(AActor* PickedUpActor)
+{
+	OnPickedActorUp.Broadcast(PickedUpActor);
+	if (const auto WeaponComponent = PickedUpActor->GetComponentByClass<UTP_WeaponComponent>())
+	{
+		OnAttachedWeapon.Broadcast(WeaponComponent);
+		WeaponComponent->AttachWeapon(this, IsLocallyControlled());
+		SetHasRifle(true);
+	}
+	PickedUpActor->SetOwner(this);
+}
