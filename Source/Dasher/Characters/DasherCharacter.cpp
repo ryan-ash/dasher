@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Net/UnrealNetwork.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -71,6 +72,13 @@ void ADasherCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+void ADasherCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME(ADasherCharacter, LookRotation);
+
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
 //////////////////////////////////////////////////////////////////////////// Input
 
 void ADasherCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -122,6 +130,8 @@ void ADasherCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+
+		LookRotation = GetControlRotation();
 	}
 }
 
@@ -131,7 +141,13 @@ void ADasherCharacter::Sprint(const FInputActionValue& Value)
 	{
 		return;
 	}
-	GetCharacterMovement()->MaxWalkSpeed = Speeds[EMovementSpeed::Sprint];
+	StartSprint_Internal();
+	ServerSprint();
+}
+
+void ADasherCharacter::ServerSprint_Implementation()
+{
+	StartSprint_Internal();
 }
 
 void ADasherCharacter::StopSprinting(const FInputActionValue& Value)
@@ -140,17 +156,35 @@ void ADasherCharacter::StopSprinting(const FInputActionValue& Value)
 	{
 		return;
 	}
-	GetCharacterMovement()->MaxWalkSpeed = Speeds[EMovementSpeed::Walk];
+	StopSprint_Internal();
+	ServerStopSprinting();
+}
+
+void ADasherCharacter::ServerStopSprinting_Implementation()
+{
+	StopSprint_Internal();
 }
 
 void ADasherCharacter::TryCrouch(const FInputActionValue& Value)
 {
-	Crouch(false);
+	Crouch_Internal();
+	ServerCrouch();
+}
+
+void ADasherCharacter::ServerCrouch_Implementation()
+{
+	Crouch_Internal();
 }
 
 void ADasherCharacter::TryUnCrouch(const FInputActionValue& Value)
 {
-	UnCrouch(false);
+	UnCrouch_Internal();
+	ServerUnCrouch();
+}
+
+void ADasherCharacter::ServerUnCrouch_Implementation()
+{
+	UnCrouch_Internal();
 }
 
 void ADasherCharacter::Fire(const FInputActionValue& Value)
@@ -175,6 +209,18 @@ void ADasherCharacter::StopFire(const FInputActionValue& Value)
 void ADasherCharacter::AltFire(const FInputActionValue& Value)
 {
 
+}
+
+void ADasherCharacter::PickUp(AActor* PickedUpActor)
+{
+	OnPickedActorUp.Broadcast(PickedUpActor);
+	if (const auto WeaponComponent = PickedUpActor->GetComponentByClass<UTP_WeaponComponent>())
+	{
+		ActiveWeaponComponent = WeaponComponent;
+		OnAttachedWeapon.Broadcast(WeaponComponent);
+		WeaponComponent->AttachWeapon(this, IsLocallyControlled());
+	}
+	PickedUpActor->SetOwner(this);
 }
 
 void ADasherCharacter::SetHasRifle(bool bNewHasRifle)
@@ -219,14 +265,22 @@ void ADasherCharacter::UnsubscribeToWeaponInput()
 	}
 }
 
-void ADasherCharacter::PickUp(AActor* PickedUpActor)
+void ADasherCharacter::StartSprint_Internal()
 {
-	OnPickedActorUp.Broadcast(PickedUpActor);
-	if (const auto WeaponComponent = PickedUpActor->GetComponentByClass<UTP_WeaponComponent>())
-	{
-		ActiveWeaponComponent = WeaponComponent;
-		OnAttachedWeapon.Broadcast(WeaponComponent);
-		WeaponComponent->AttachWeapon(this, IsLocallyControlled());
-	}
-	PickedUpActor->SetOwner(this);
+	GetCharacterMovement()->MaxWalkSpeed = Speeds[EMovementSpeed::Sprint];
+}
+
+void ADasherCharacter::StopSprint_Internal()
+{
+	GetCharacterMovement()->MaxWalkSpeed = Speeds[EMovementSpeed::Walk];
+}
+
+void ADasherCharacter::Crouch_Internal()
+{
+	Crouch(!HasAuthority());
+}
+
+void ADasherCharacter::UnCrouch_Internal()
+{
+	UnCrouch(!HasAuthority());
 }

@@ -43,6 +43,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
 	USkeletalMeshComponent* Mesh1P;
@@ -108,17 +110,29 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = Input)
 	void Sprint(const FInputActionValue& Value);
 
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = Network)
+	void ServerSprint();
+
 	/** Called for stopping sprint input */
 	UFUNCTION(BlueprintCallable, Category = Input)
 	void StopSprinting(const FInputActionValue& Value);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = Network)
+	void ServerStopSprinting();
 
 	/** Called for crouching input */
 	UFUNCTION(BlueprintCallable, Category = Input)
 	void TryCrouch(const FInputActionValue& Value);
 
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = Network)
+	void ServerCrouch();
+
 	/** Called for stopping crouch input */
 	UFUNCTION(BlueprintCallable, Category = Input)
 	void TryUnCrouch(const FInputActionValue& Value);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = Network)
+	void ServerUnCrouch();
 
 	UFUNCTION(BlueprintCallable, Category = Input)
 	void Fire(const FInputActionValue& Value);
@@ -133,6 +147,9 @@ protected:
 	void AltFire(const FInputActionValue& Value);
 
 public:
+
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = Weapon)
+	FRotator LookRotation;
 
 	/** Bool for AnimBP to switch to another animation set */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
@@ -167,6 +184,12 @@ public:
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
 private:
+
+	void StartSprint_Internal();
+	void StopSprint_Internal();
+
+	void Crouch_Internal();
+	void UnCrouch_Internal();
 
 	TWeakObjectPtr<UTP_WeaponComponent> ActiveWeaponComponent;
 };
