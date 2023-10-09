@@ -132,7 +132,13 @@ void ADasherCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 
 		LookRotation = GetControlRotation();
+		ServerLook(LookRotation);
 	}
+}
+
+void ADasherCharacter::ServerLook_Implementation(const FRotator& NewRotation)
+{
+	LookRotation = NewRotation;
 }
 
 void ADasherCharacter::Sprint(const FInputActionValue& Value)

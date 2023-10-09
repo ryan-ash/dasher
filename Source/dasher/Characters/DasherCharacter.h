@@ -106,6 +106,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = Input)
 	void Look(const FInputActionValue& Value);
 
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = Network)
+	void ServerLook(const FRotator& NewRotation);
+
 	/** Called for sprinting input */
 	UFUNCTION(BlueprintCallable, Category = Input)
 	void Sprint(const FInputActionValue& Value);
