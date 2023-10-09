@@ -9,10 +9,10 @@
 UCLASS(minimalapi)
 class ADasherGameMode : public AGameModeBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	ADasherGameMode();
+    ADasherGameMode();
 };
 
 

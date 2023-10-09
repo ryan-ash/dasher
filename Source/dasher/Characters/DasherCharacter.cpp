@@ -18,193 +18,193 @@
 
 ADasherCharacter::ADasherCharacter()
 {
-	// Character doesnt have a rifle at start
-	bHasRifle = false;
-	
-	// Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
-		
-	// Create a CameraComponent	
-	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
-	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
-	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+    // Character doesnt have a rifle at start
+    bHasRifle = false;
+    
+    // Set size for collision capsule
+    GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
+        
+    // Create a CameraComponent    
+    FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+    FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
+    FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
+    FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
-	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
-	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
-	Mesh1P->SetOnlyOwnerSee(true);
-	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
-	Mesh1P->bCastDynamicShadow = false;
-	Mesh1P->CastShadow = false;
-	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
-	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+    // Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
+    Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
+    Mesh1P->SetOnlyOwnerSee(true);
+    Mesh1P->SetupAttachment(FirstPersonCameraComponent);
+    Mesh1P->bCastDynamicShadow = false;
+    Mesh1P->CastShadow = false;
+    //Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
+    Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
 }
 
 void ADasherCharacter::BeginPlay()
 {
-	// Call the base class  
-	Super::BeginPlay();
+    // Call the base class  
+    Super::BeginPlay();
 
-	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
-	}
+    //Add Input Mapping Context
+    if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+    {
+        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+        {
+            Subsystem->AddMappingContext(DefaultMappingContext, 0);
+        }
+    }
 
 }
 
 void ADasherCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	// Remove Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->RemoveMappingContext(DefaultMappingContext);
-		}
-	}
-	UnsubscribeToWeaponInput();
+    // Remove Input Mapping Context
+    if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+    {
+        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+        {
+            Subsystem->RemoveMappingContext(DefaultMappingContext);
+        }
+    }
+    UnsubscribeToWeaponInput();
 
-	Super::EndPlay(EndPlayReason);
+    Super::EndPlay(EndPlayReason);
 }
 
 void ADasherCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	DOREPLIFETIME(ADasherCharacter, LookRotation);
+    DOREPLIFETIME(ADasherCharacter, LookRotation);
 
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
 
 void ADasherCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
-	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+    // Set up action bindings
+    if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+    {
+        //Jumping
+        EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+        EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADasherCharacter::Move);
+        //Moving
+        EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADasherCharacter::Move);
 
-		//Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADasherCharacter::Look);
+        //Looking
+        EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADasherCharacter::Look);
 
-		//Sprinting
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ADasherCharacter::Sprint);
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ADasherCharacter::StopSprinting);
+        //Sprinting
+        EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ADasherCharacter::Sprint);
+        EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ADasherCharacter::StopSprinting);
 
-		//Crouching
-		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ADasherCharacter::TryCrouch);
-		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ADasherCharacter::TryUnCrouch);
-	}
+        //Crouching
+        EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ADasherCharacter::TryCrouch);
+        EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ADasherCharacter::TryUnCrouch);
+    }
 }
 
 
 void ADasherCharacter::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
+    // input is a Vector2D
+    FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr)
-	{
-		// add movement 
-		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
-		AddMovementInput(GetActorRightVector(), MovementVector.X);
-	}
+    if (Controller != nullptr)
+    {
+        // add movement 
+        AddMovementInput(GetActorForwardVector(), MovementVector.Y);
+        AddMovementInput(GetActorRightVector(), MovementVector.X);
+    }
 }
 
 void ADasherCharacter::Look(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
+    // input is a Vector2D
+    FVector2D LookAxisVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr)
-	{
-		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
+    if (Controller != nullptr)
+    {
+        // add yaw and pitch input to controller
+        AddControllerYawInput(LookAxisVector.X);
+        AddControllerPitchInput(LookAxisVector.Y);
 
-		LookRotation = GetControlRotation();
-		ServerLook(LookRotation);
-	}
+        LookRotation = GetControlRotation();
+        ServerLook(LookRotation);
+    }
 }
 
 void ADasherCharacter::ServerLook_Implementation(const FRotator& NewRotation)
 {
-	LookRotation = NewRotation;
+    LookRotation = NewRotation;
 }
 
 void ADasherCharacter::Sprint(const FInputActionValue& Value)
 {
-	if (GetCharacterMovement()->IsCrouching() || GetCharacterMovement()->IsFalling() || !Speeds.Contains(EMovementSpeed::Sprint))
-	{
-		return;
-	}
-	StartSprint_Internal();
-	ServerSprint();
+    if (GetCharacterMovement()->IsCrouching() || GetCharacterMovement()->IsFalling() || !Speeds.Contains(EMovementSpeed::Sprint))
+    {
+        return;
+    }
+    StartSprint_Internal();
+    ServerSprint();
 }
 
 void ADasherCharacter::ServerSprint_Implementation()
 {
-	StartSprint_Internal();
+    StartSprint_Internal();
 }
 
 void ADasherCharacter::StopSprinting(const FInputActionValue& Value)
 {
-	if (!Speeds.Contains(EMovementSpeed::Walk))
-	{
-		return;
-	}
-	StopSprint_Internal();
-	ServerStopSprinting();
+    if (!Speeds.Contains(EMovementSpeed::Walk))
+    {
+        return;
+    }
+    StopSprint_Internal();
+    ServerStopSprinting();
 }
 
 void ADasherCharacter::ServerStopSprinting_Implementation()
 {
-	StopSprint_Internal();
+    StopSprint_Internal();
 }
 
 void ADasherCharacter::TryCrouch(const FInputActionValue& Value)
 {
-	Crouch_Internal();
-	ServerCrouch();
+    Crouch_Internal();
+    ServerCrouch();
 }
 
 void ADasherCharacter::ServerCrouch_Implementation()
 {
-	Crouch_Internal();
+    Crouch_Internal();
 }
 
 void ADasherCharacter::TryUnCrouch(const FInputActionValue& Value)
 {
-	UnCrouch_Internal();
-	ServerUnCrouch();
+    UnCrouch_Internal();
+    ServerUnCrouch();
 }
 
 void ADasherCharacter::ServerUnCrouch_Implementation()
 {
-	UnCrouch_Internal();
+    UnCrouch_Internal();
 }
 
 void ADasherCharacter::Fire(const FInputActionValue& Value)
 {
-	if (ActiveWeaponComponent.IsValid())
-	{
-		ActiveWeaponComponent->Fire();
-		ServerFire();
-	}
+    if (ActiveWeaponComponent.IsValid())
+    {
+        ActiveWeaponComponent->Fire();
+        ServerFire();
+    }
 }
 
 void ADasherCharacter::ServerFire_Implementation()
 {
-	ActiveWeaponComponent->ServerFire();
+    ActiveWeaponComponent->ServerFire();
 }
 
 void ADasherCharacter::StopFire(const FInputActionValue& Value)
@@ -219,74 +219,74 @@ void ADasherCharacter::AltFire(const FInputActionValue& Value)
 
 void ADasherCharacter::PickUp(AActor* PickedUpActor)
 {
-	OnPickedActorUp.Broadcast(PickedUpActor);
-	if (const auto WeaponComponent = PickedUpActor->GetComponentByClass<UTP_WeaponComponent>())
-	{
-		ActiveWeaponComponent = WeaponComponent;
-		OnAttachedWeapon.Broadcast(WeaponComponent);
-		WeaponComponent->AttachWeapon(this, IsLocallyControlled());
-	}
-	PickedUpActor->SetOwner(this);
+    OnPickedActorUp.Broadcast(PickedUpActor);
+    if (const auto WeaponComponent = PickedUpActor->GetComponentByClass<UTP_WeaponComponent>())
+    {
+        ActiveWeaponComponent = WeaponComponent;
+        OnAttachedWeapon.Broadcast(WeaponComponent);
+        WeaponComponent->AttachWeapon(this, IsLocallyControlled());
+    }
+    PickedUpActor->SetOwner(this);
 }
 
 void ADasherCharacter::SetHasRifle(bool bNewHasRifle)
 {
-	bHasRifle = bNewHasRifle;
-	if (bHasRifle)
-	{
-		SubscribeToWeaponInput();
-	}
+    bHasRifle = bNewHasRifle;
+    if (bHasRifle)
+    {
+        SubscribeToWeaponInput();
+    }
 }
 
 bool ADasherCharacter::GetHasRifle()
 {
-	return bHasRifle;
+    return bHasRifle;
 }
 
 void ADasherCharacter::SubscribeToWeaponInput()
 {
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(FireMappingContext, 1);
+    if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+    {
+        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+        {
+            Subsystem->AddMappingContext(FireMappingContext, 1);
 
-			if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-			{
-				EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ADasherCharacter::Fire);
-				EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ADasherCharacter::StopFire);
-			}
-		}
-	}
+            if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
+            {
+                EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ADasherCharacter::Fire);
+                EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ADasherCharacter::StopFire);
+            }
+        }
+    }
 }
 
 void ADasherCharacter::UnsubscribeToWeaponInput()
 {
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->RemoveMappingContext(FireMappingContext);
-		}
-	}
+    if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+    {
+        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+        {
+            Subsystem->RemoveMappingContext(FireMappingContext);
+        }
+    }
 }
 
 void ADasherCharacter::StartSprint_Internal()
 {
-	GetCharacterMovement()->MaxWalkSpeed = Speeds[EMovementSpeed::Sprint];
+    GetCharacterMovement()->MaxWalkSpeed = Speeds[EMovementSpeed::Sprint];
 }
 
 void ADasherCharacter::StopSprint_Internal()
 {
-	GetCharacterMovement()->MaxWalkSpeed = Speeds[EMovementSpeed::Walk];
+    GetCharacterMovement()->MaxWalkSpeed = Speeds[EMovementSpeed::Walk];
 }
 
 void ADasherCharacter::Crouch_Internal()
 {
-	Crouch(!HasAuthority());
+    Crouch(!HasAuthority());
 }
 
 void ADasherCharacter::UnCrouch_Internal()
 {
-	UnCrouch(!HasAuthority());
+    UnCrouch(!HasAuthority());
 }
